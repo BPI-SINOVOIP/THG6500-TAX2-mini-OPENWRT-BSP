@@ -1,0 +1,57 @@
+[ ! -e /etc/config/prplmesh ] && exit 0
+
+. /lib/functions/system.sh
+. /lib/functions/working-mode.sh
+
+set_mesh()
+{
+    local enable=`uci -q get prplmesh.config.enable`
+    local curmode=`uci get network.globals.curmode` # bridge/router/repeater
+
+    # do nothing if mesh is disabled
+    if [ -z "${enable}" -o "${enable}" = '0' ]; then
+        return
+    fi
+
+
+    # agent works in bridge mode, and controller works in router mode
+    case $curmode in
+        'bridge')
+            working_mode_set_prplmesh 'agent'
+            working_mode_set_wireless 'agent'
+            ;;
+        'router')
+            working_mode_set_prplmesh 'controller'
+            working_mode_set_wireless 'controller'
+            ;;
+        *)
+            ;;
+    esac
+}
+
+
+
+
+
+main()
+{
+    local device=$(board_name)
+
+
+    case $device in
+        'example_mesh_disabled')
+            uci set prplmesh.config.enable='0'
+            ;;
+        *)
+            ;;
+    esac
+
+
+    # set mesh related config
+    `set_mesh $device`
+}
+
+
+main
+
+exit 0

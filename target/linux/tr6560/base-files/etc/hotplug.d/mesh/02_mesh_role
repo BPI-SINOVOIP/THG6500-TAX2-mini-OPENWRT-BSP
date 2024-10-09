@@ -1,0 +1,15 @@
+#!/bin/sh
+. /lib/functions/system.sh
+. /lib/functions/working-mode.sh
+
+
+
+case "$ACTION" in
+    "rolechange")
+        if [ "$MODE" != "gateway_mode" ]; then
+            exit 0
+        fi
+
+        /bin/scripts/modeSet.sh  controller
+        ;;
+esac

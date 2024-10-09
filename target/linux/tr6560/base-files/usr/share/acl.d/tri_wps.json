@@ -1,0 +1,17 @@
+{
+	"user": "network",
+	"access": {
+		"led": {
+			"methods": [ "set" ]
+		},
+		"hotplug.hostapd": {
+			"methods": [ "call" ]
+		},
+		"uci": {
+			"methods": [ "get" ]
+		},
+		"hotplug.led": {
+			"methods": [ "call" ]
+		}
+	}
+}

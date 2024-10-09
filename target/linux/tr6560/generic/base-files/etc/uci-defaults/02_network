@@ -1,0 +1,44 @@
+[ -e '/etc/config/network' ] || exit 0
+
+. /lib/functions/system.sh
+. /lib/functions/working-mode.sh
+
+set_network()
+{
+    local device=$1
+    local curmode=''
+
+    # device independent config
+    uci batch << 'EOF'
+        set network.agent='interface'
+        set network.agent.proto='dhcp'
+        set network.agent.device='br-lan'
+        set network.wwan='interface'
+        set network.wwan.proto='dhcp'
+
+        set network.globals.ula_prefix=''
+        set network.@device[0].multicast_to_unicast='0'
+EOF
+
+    # device dependent config
+    case $device in
+        'example_router')
+            curmode='router'
+            ;;
+        *)
+            curmode='router'
+            ;;
+    esac
+
+
+    working_mode_set_network $curmode
+}
+
+main()
+{
+    local device=$(board_name)
+
+    `set_network $device`
+}
+
+main

@@ -1,0 +1,40 @@
+#!/bin/sh /etc/rc.common
+
+START=10
+STOP=90
+
+
+
+
+
+start()
+{
+    model=`cat /tmp/sysinfo/model`
+    mknod   /dev/tri_hlp             c  10 19
+
+    #set kernel net parameter
+    sysctl -wn net.netfilter.nf_conntrack_udp_timeout=60
+    sysctl -wn net.netfilter.nf_conntrack_tcp_timeout_established=600
+
+    cs_cli /home/cli/api/hal/qos/qos_mode_set -v mode 0
+
+
+    cs_cli /home/cli/api/protocol/cfe/lrn/lrn_setcfg -v enable 1 lrnmode 1 lrn 5 br 1 echo_acc_en 1 ipv6_acc_en 1 agemode 0 age 1
+    cs_cli /home/cli/api/hal/flow/ifc_set -v cnt_en 1 fwd_act_en 1 fwd_act 7 frame_en 1 frame 2 igr 0x200 
+
+    #asm3042: set gpio 17
+    cs_cli /home/cli/api/hal/chip/gpio_attr_set -v gpio 17 mode 1
+    cs_cli /home/cli/api/hal/chip/gpio_write -v gpio 17 level 1
+
+    # M2.KeyB power set gpio 27
+    cs_cli /home/cli/api/hal/chip/gpio_attr_set -v gpio 27 mode 1
+    cs_cli /home/cli/api/hal/chip/gpio_write -v gpio 27 level 1
+
+    ifconfig eth0 up
+
+    touch /var/state/hosts
+    touch /var/state/upstreams
+    uci -c /var/state set upstreams.us1=upstream
+    uci -c /var/state/ commit upstreams
+}
+
